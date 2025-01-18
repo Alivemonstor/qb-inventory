@@ -804,24 +804,44 @@ function RemoveItem(identifier, item, amount, slot, reason)
         return false
     end
 
-    slot = tonumber(slot) or GetFirstSlotByItem(inventory, item)
-
-    if not slot then
-        print('RemoveItem: Slot not found')
-        return false
-    end
+    slot = tonumber(slot) or nil
 
     local inventoryItem = nil
     local itemKey = nil
+    local itemstocheck = {}
 
     for key, invItem in pairs(inventory) do
-        if invItem.slot == slot then
-            inventoryItem = invItem
-            itemKey = key
-            break
+        if slot ~= nil then 
+            if invItem.slot == slot then
+                inventoryItem = invItem
+                itemKey = key
+                break
+            end
+        else
+            if invItem.name == item then
+                itemstocheck[#itemstocheck+1] = invItem
+            end
         end
     end
 
+    if slot == nil then
+        if #itemstocheck > 1 then 
+            local amounttocheck = 0
+            for k,v in pairs(itemstocheck) do
+                if v.amount > amounttocheck then
+                    amounttocheck = v.amount
+                    inventoryItem = v
+                    itemKey = v.slot
+                    slot = v.slot
+                end
+            end
+        else
+            inventoryItem = itemstocheck[1]
+            itemKey = itemstocheck[1].slot
+            slot = itemstocheck[1].slot
+        end
+    end
+    
     if not inventoryItem or inventoryItem.name:lower() ~= item:lower() then
         print('RemoveItem: Item not found in slot')
         return false
