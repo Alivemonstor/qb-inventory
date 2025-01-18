@@ -841,6 +841,11 @@ function RemoveItem(identifier, item, amount, slot, reason)
             slot = itemstocheck[1].slot
         end
     end
+
+    if not slot then
+        print('RemoveItem: Slot not found')
+        return false
+    end
     
     if not inventoryItem or inventoryItem.name:lower() ~= item:lower() then
         print('RemoveItem: Item not found in slot')
